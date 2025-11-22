@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { IntakeScreen } from "@/features/intake/IntakeScreen";
 import { RecommendationPendingScreen } from "@/features/recommendation/RecommendationPendingScreen";

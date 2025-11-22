@@ -21,6 +21,7 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
+    "types": ["vite/client"],
 
     /* Path aliases */
     "baseUrl": ".",

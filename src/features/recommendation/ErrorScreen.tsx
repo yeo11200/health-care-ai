@@ -13,7 +13,6 @@ export const ErrorScreen = React.memo(() => {
   };
 
   const error = state?.error || "알 수 없는 오류가 발생했습니다.";
-  const retryScreen = state?.retryScreen;
 
   const handleRetry = useCallback(() => {
     navigate("/");
