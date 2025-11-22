@@ -1,0 +1,45 @@
+.textarea-container {
+  margin-bottom: 16px;
+}
+
+.textarea-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.textarea-required {
+  color: #e74c3c;
+}
+
+.textarea-field {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #fff;
+  min-height: 100px;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.textarea-field:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.textarea-field.textarea-error {
+  border-color: #e74c3c;
+}
+
+.textarea-error-text {
+  display: block;
+  color: #e74c3c;
+  font-size: 14px;
+  margin-top: 4px;
+}
+

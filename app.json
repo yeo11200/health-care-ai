@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Supplement Recommendation App",
+    "slug": "supplement-recommendation-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.supplementrecommendation.app",
+      "deploymentTarget": "15.0"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.supplementrecommendation.app",
+      "minSdkVersion": 24
+    },
+    "web": {},
+    "plugins": []
+  }
+}

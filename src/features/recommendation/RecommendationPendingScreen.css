@@ -1,0 +1,45 @@
+.recommendation-pending-screen-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommendation-pending-screen-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.recommendation-pending-screen-spinner {
+  font-size: 48px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.recommendation-pending-screen-text {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+}
+
+.recommendation-pending-screen-error-text {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #e74c3c;
+  text-align: center;
+}
+

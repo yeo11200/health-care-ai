@@ -1,0 +1,106 @@
+.supplement-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.supplement-card-caution {
+  border-left: 4px solid #e67e22;
+  background-color: #fffaf5;
+}
+
+.supplement-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.supplement-card-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  background-color: #3498db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.supplement-card-name {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.supplement-card-content {
+  margin-left: 44px;
+}
+
+.supplement-card-dosage-section {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.supplement-card-dosage-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #3498db;
+  margin-bottom: 4px;
+}
+
+.supplement-card-dosage {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #3498db;
+}
+
+.supplement-card-reason-section {
+  margin-bottom: 12px;
+}
+
+.supplement-card-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.supplement-card-reason {
+  font-size: 16px;
+  color: #333;
+  line-height: 24px;
+  margin: 0;
+}
+
+.supplement-card-caution-section {
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.supplement-card-caution-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e67e22;
+  margin-bottom: 4px;
+}
+
+.supplement-card-caution-text {
+  font-size: 14px;
+  color: #e67e22;
+  line-height: 20px;
+  margin: 0;
+}
+
