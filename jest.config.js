@@ -1,12 +1,19 @@
 module.exports = {
-  preset: "jest-expo",
-  transformIgnorePatterns: [
-    "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)",
-  ],
-  setupFilesAfterEnv: ["@testing-library/jest-native/extend-expect"],
+  preset: "ts-jest",
+  testEnvironment: "node",
+  roots: ["<rootDir>/src"],
+  testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+  transform: {
+    "^.+\\.ts$": "ts-jest",
+  },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^@/features/(.*)$": "<rootDir>/src/features/$1",
     "^@/libs/(.*)$": "<rootDir>/src/libs/$1",
   },
+  collectCoverageFrom: [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/*.spec.{ts,tsx}",
+  ],
 };
