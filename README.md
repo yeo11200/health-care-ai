@@ -80,6 +80,7 @@ algo-health-care/
 3. 배포 완료!
 
 Vercel은 자동으로:
+
 - 프론트엔드를 정적 사이트로 배포
 - `/api` 폴더의 함수를 Serverless Functions로 배포
 - 환경 변수를 서버에만 노출
@@ -153,7 +154,8 @@ USE_MOCK_API=false
 PORT=3001
 ```
 
-**중요**: 
+**중요**:
+
 - 서버 측 환경 변수는 `VITE_` 접두사 **없이** 사용합니다.
 - `.env` 파일은 Git에 커밋하지 마세요.
 
@@ -221,7 +223,7 @@ Mock 모드에서는 실제 API 호출 없이 미리 정의된 추천 결과를 
 1. **네비게이션**: React Navigation → React Router
 2. **UI 컴포넌트**: React Native 컴포넌트 → React DOM 컴포넌트
 3. **스타일링**: StyleSheet → CSS Modules
-4. **환경 변수**: EXPO_PUBLIC_ → VITE_ (클라이언트), 서버는 접두사 없음
+4. **환경 변수**: EXPO*PUBLIC* → VITE\_ (클라이언트), 서버는 접두사 없음
 5. **빌드 도구**: Expo → Vite
 6. **보안 개선**: 백엔드 프록시 서버 추가로 API 키 보호
 
