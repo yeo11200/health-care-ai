@@ -1,12 +1,13 @@
 import OpenAI from "openai";
-import dotenv from "dotenv";
 import { buildPrompt } from "./llmPrompt.js";
 import { parseLLMResponse } from "./llmParser.js";
 import type { HealthProfile } from "../src/features/intake/intake.types.js";
 import type { LLMRecommendation, LLMError } from "../src/libs/api/llm.types.js";
 
-// 환경 변수 로드
-dotenv.config();
+// Vercel 환경에서는 환경 변수가 자동으로 제공되므로 dotenv.config() 불필요
+// 로컬 개발 시에만 필요하면 주석 해제:
+// import dotenv from "dotenv";
+// dotenv.config();
 
 /**
  * 환경 변수에서 API 설정을 가져옵니다.
