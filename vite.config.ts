@@ -12,14 +12,6 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    // Vercel Dev Server를 사용하지 않는 경우 프록시 설정 (선택사항)
-    // Vercel Dev Server 사용 시 이 설정은 필요 없음
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:3001',
-    //     changeOrigin: true,
-    //   },
-    // },
   },
 });
 

@@ -1,24 +1,16 @@
 import { HealthProfile } from "@/features/intake/intake.types";
 import { LLMRecommendation, LLMError } from "./llm.types";
+import { llmResponseSchema } from "./llm.schema";
 
 /**
- * 🔒 보안 개선: 백엔드 프록시 서버를 통해 API 호출
- *
- * API 키는 서버에서만 관리되며 클라이언트에 노출되지 않습니다.
- * Vercel Serverless Functions를 통해 API 호출
+ * 새 추천 API를 직접 호출합니다.
+ * 클라이언트에서 직접 API 서버를 호출합니다.
  */
 
-// Vercel 환경에서는 자동으로 같은 도메인의 /api 경로 사용
-// 로컬 개발 시에는 백엔드 서버(포트 3001) 또는 Vercel Dev Server 사용
+// API 기본 URL 설정
 const getApiBaseUrl = () => {
-  // 프로덕션 환경에서는 상대 경로 사용 (같은 도메인)
-  if (import.meta.env.PROD) {
-    return "";
-  }
-
-  // 개발 환경: 환경 변수가 있으면 사용, 없으면 백엔드 서버(3001) 사용
-  // Vercel Dev Server를 사용하는 경우 빈 문자열(상대 경로) 사용
-  return import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
+  // 환경 변수에서 API Base URL 가져오기 (기본값: http://localhost:8000)
+  return import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -96,7 +88,65 @@ function getMockRecommendation(profile: HealthProfile): LLMRecommendation {
 }
 
 /**
- * 백엔드 프록시 서버를 통해 LLM API를 호출합니다.
+ * API 응답 파싱 (result 필드가 JSON 문자열 또는 객체일 수 있음)
+ */
+function parseAPIResponse(response: {
+  result: string | object;
+  model_id?: string;
+  region?: string;
+}): LLMRecommendation {
+  try {
+    let parsed: any;
+
+    // result가 문자열이면 파싱, 객체면 그대로 사용
+    if (typeof response.result === "string") {
+      console.log("📝 result가 문자열, JSON 파싱 시도...");
+      parsed = JSON.parse(response.result);
+    } else if (typeof response.result === "object") {
+      console.log("📦 result가 객체, 그대로 사용...");
+      parsed = response.result;
+    } else {
+      throw new Error(`예상치 못한 result 타입: ${typeof response.result}`);
+    }
+
+    console.log("✅ 파싱된 데이터:", parsed);
+    const validated = llmResponseSchema.parse(parsed);
+
+    if (!validated.supplements || validated.supplements.length === 0) {
+      return {
+        supplements: [
+          {
+            name: "종합 비타민",
+            dosage: "1정 (제조사 권장량)",
+            reason: "기본적인 영양소 보충을 위해 추천합니다.",
+            caution: "개인 맞춤 추천을 위해 정확한 정보 입력이 필요합니다.",
+          },
+        ],
+        summary: "안전 모드 추천입니다. 정확한 추천을 위해 다시 시도해주세요.",
+      };
+    }
+
+    return validated;
+  } catch (error) {
+    console.error("❌ API 응답 파싱 실패:", error);
+    console.error("📄 원본 result:", response.result);
+    console.error("📄 result 타입:", typeof response.result);
+
+    // 에러 상세 정보
+    if (error instanceof Error) {
+      console.error("에러 메시지:", error.message);
+      console.error("에러 스택:", error.stack);
+    }
+
+    throw {
+      type: "parse",
+      message: `API 응답을 파싱할 수 없습니다: ${error instanceof Error ? error.message : "알 수 없는 오류"}`,
+    } as LLMError;
+  }
+}
+
+/**
+ * 새로운 추천 API를 직접 호출합니다.
  *
  * @param profile - 사용자의 건강 정보
  * @param useMock - Mock 응답 사용 여부 (기본값: 환경 변수 또는 false)
@@ -115,39 +165,90 @@ export async function getRecommendation(
     return getMockRecommendation(profile);
   }
 
-  try {
-    // Vercel 환경에서는 같은 도메인의 /api/recommendation 사용
-    const apiUrl = `${API_BASE_URL}/api/recommendation`;
+  const TIMEOUT_MS = 60000;
 
-    const response = await fetch(apiUrl, {
+  try {
+    console.log("🌐 API 요청 전송:", `${API_BASE_URL}/health/recommend`);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    const response = await fetch(`${API_BASE_URL}/health/recommend`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(profile),
+      body: JSON.stringify({
+        profile: {
+          age: profile.age,
+          gender: profile.gender,
+          weight: profile.weight,
+          smoking: profile.smoking,
+          medications: profile.medications,
+          concerns: profile.concerns,
+          lifestyle: profile.lifestyle,
+        },
+      }),
+      signal: controller.signal,
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({
-        type: "api",
-        message: `서버 오류 (${response.status}): ${response.statusText}`,
-      }));
+    clearTimeout(timeoutId);
 
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      console.error("❌ API 오류 응답:", response.status, errorText);
       throw {
-        type: errorData.type || "api",
-        message: errorData.message || "서버 오류가 발생했습니다.",
+        type: "api",
+        message: `API 오류 (${response.status}): ${response.statusText}${errorText ? ` - ${errorText}` : ""}`,
       } as LLMError;
     }
 
-    const recommendation: LLMRecommendation = await response.json();
-    return recommendation;
+    const data = await response.json();
+    console.log("📦 API 원본 응답:", JSON.stringify(data, null, 2));
+    console.log("📦 API 응답 타입:", typeof data);
+    console.log("📦 result 필드 존재:", "result" in data);
+    console.log("📦 result 타입:", typeof data.result);
+
+    // 응답이 직접 supplements 배열을 가지고 있는 경우 (result 필드 없음)
+    if (data.supplements && Array.isArray(data.supplements)) {
+      console.log("✅ 응답이 직접 supplements 배열을 포함함");
+      const validated = llmResponseSchema.parse(data);
+      return validated;
+    }
+
+    // result 필드가 있는 경우
+    if (!data.result) {
+      console.error("❌ result 필드 없음:", data);
+      throw {
+        type: "api",
+        message: "API 응답에 result 필드가 없습니다.",
+      } as LLMError;
+    }
+
+    console.log("🔍 result 필드 파싱 시작:", data.result);
+    const parsed = parseAPIResponse(data);
+    console.log("✅ 파싱 완료:", parsed);
+    return parsed;
   } catch (error: any) {
+    // 타임아웃 에러
+    if (
+      error.name === "AbortError" ||
+      (error instanceof Error && error.message.includes("timeout"))
+    ) {
+      throw {
+        type: "timeout",
+        message: "API 호출 시간이 초과되었습니다. 다시 시도해주세요.",
+      } as LLMError;
+    }
+
     // 네트워크 에러
-    if (error instanceof TypeError && error.message.includes("fetch")) {
+    if (
+      error instanceof TypeError &&
+      (error.message.includes("fetch") || error.message.includes("network"))
+    ) {
       throw {
         type: "network",
         message:
-          "백엔드 서버에 연결할 수 없습니다. 서버가 실행 중인지 확인해주세요.",
+          "네트워크 연결을 확인해주세요. API 서버가 실행 중인지 확인해주세요.",
       } as LLMError;
     }
 
@@ -158,7 +259,7 @@ export async function getRecommendation(
 
     // 기타 에러
     throw {
-      type: "network",
+      type: "api",
       message:
         error instanceof Error
           ? error.message
